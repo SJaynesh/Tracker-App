@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:budget_tracker_app/models/category_model.dart';
+import 'package:budget_tracker_app/models/spending_model.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:sqflite/sqflite.dart';
@@ -116,12 +119,43 @@ class DBHelper {
   }
 
   // TODO: Fetch Records
-
   Future<List<CategoryModel>> fetchAllCategory() async {
     await initDB();
 
     String query = "SELECT * FROM $categoryTable;";
     List<Map<String, dynamic>> res = await db?.rawQuery(query) ?? [];
+
+    return res
+        .map(
+          (e) => CategoryModel.formData(data: e),
+        )
+        .toList();
+  }
+
+  Future<List<SpendingModel>> fetchAllSpending() async {
+    await initDB();
+
+    String query = "SELECT * FROM $spendingTable;";
+
+    List<Map<String, dynamic>> res = await db?.rawQuery(query) ?? [];
+
+    return res
+        .map(
+          (e) => SpendingModel.fromMap(data: e),
+        )
+        .toList();
+  }
+
+  Future<List<CategoryModel>> fetchSingleCategory({required int id}) async {
+    await initDB();
+
+    log("ID : $id");
+
+    String query = "SELECT * FROM $categoryTable WHERE id=?";
+
+    List arg = [id];
+
+    List<Map<String, dynamic>> res = await db?.rawQuery(query, arg) ?? [];
 
     return res
         .map(
